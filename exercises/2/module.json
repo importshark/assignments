@@ -1,0 +1,13 @@
+{
+  "requiredData": {
+    "required": 1,
+    "data": [
+      {
+        "name":  "integer",
+        "value": "Hours worked"
+      }
+    ]
+  },
+  "path": "D:\\Projects\\assignments\\exercises\\2"
+
+}

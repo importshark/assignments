@@ -1,0 +1,7 @@
+{
+  "spawnArgs": {
+    "windowsHide": true,
+    "stdio": "pipe"
+  },
+  "nodePath": ""
+}
