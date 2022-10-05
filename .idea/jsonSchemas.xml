@@ -31,6 +31,9 @@
                   <Item>
                     <option name="path" value="exercises/2/module.json" />
                   </Item>
+                  <Item>
+                    <option name="path" value="exercises/1/module.json" />
+                  </Item>
                 </list>
               </option>
             </SchemaInfo>

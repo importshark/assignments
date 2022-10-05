@@ -1,7 +1,8 @@
 {
   "spawnArgs": {
     "windowsHide": true,
-    "stdio": "pipe"
+    "stdio": "inherit",
+    "cwd": "D:\\Projects\\assignments\\data\\node\\18.10"
   },
-  "nodePath": ""
+  "nodePath": "D:\\Projects\\assignments\\data\\node\\18.10"
 }

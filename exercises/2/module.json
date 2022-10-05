@@ -4,10 +4,11 @@
     "data": [
       {
         "name":  "integer",
-        "value": "Hours worked"
+        "value": "Please enter hours worked: "
       }
     ]
   },
-  "path": "D:\\Projects\\assignments\\exercises\\2"
+  "path": "D:\\Projects\\assignments\\exercises\\2",
+  "mainFile": "main.js"
 
 }
