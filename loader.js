@@ -1,9 +1,13 @@
+throw new Error("IPC listener for socket")
+
 const fs = require('fs');
 const {spawn, spawnSync, fork} = require('child_process');
 //const {spawnArgs, nodePath} = require('./loaderData.json')
 const http = require('http');
 const express = require('express');
+var cookieParser = require('cookie-parser')
 const app = express();
+app.use(cookieParser())
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
@@ -11,7 +15,52 @@ var request = require('then-request');;
 const extract = require('extract-zip')
 const fetch = require('node-fetch');
 
+const clients = new Map();
 
+let queues = new Map();
+
+
+function queueUpdate(){
+console.log('queueUpdate');
+
+
+
+    for(var [key, value] of clients) {
+
+        if(value === "unknown") continue;
+
+        let socket = value;
+
+
+
+        console.log(key + " has a socket of " + value.id + ".");
+
+            let queue = queues.get(key);
+
+            queue.length > 0 ? console.log(key + " has a queue of " + queue + ".") : console.log(key + " has an empty queue.");
+
+            for(var i = 0; i < queue.length; i++){
+
+                let element = queue[i];
+                if(element.arg){
+
+                    console.log("Emit " + element.name + " on socket " + socket.id + " with arg " + element.arg)
+                    socket.emit(element.name, element.arg);
+
+                }
+                else{
+
+                    console.log("Emit " + element.name + " on socket " + socket.id )
+                    socket.emit(element.name)
+                }
+            }
+
+            clients.set(key, [])
+
+
+
+    }
+}
 
 async function download(url, dest) {
     const response = await fetch(url);
@@ -69,30 +118,54 @@ app.get('/assignments/', async (req, res) => {
 
     const id = req.query.id
 
-    let installed = false
+    let cookie = req.cookies.id;
+
+    let identifier = parseInt(cookie)
+
+
+    let installed = true
 
     try{
     let data = JSON.parse(fs.readFileSync("./exercise/module.json"))
-    if(data.id == id) installed = true
     }catch(e){
+        installed = false
         console.log("Read/Parse failed with error: " + e)
     }
+        console.log(installed)
+
+
+        if(!identifier){
+
+        identifier = Math.floor(Math.random() * 1000000)
+
+        while(clients.has(identifier)) identifier = Math.floor(Math.random() * 1000000)
+
+        res.cookie("id", identifier)
+
+        }
+
+        clients.set(identifier, "unknown")
+        queues.set(identifier, []);
+
+        if(!installed) await install(id, identifier)
+
+
+
+            return res.render('assignment', {data: { id: id, identification: identifier} })
+
 
     
 
 
-
-
-    return res.render('assignment', {reqData: [], id})
 })
 
 
-async function install(id){
+async function install(packageId, id){
+
+console.log(queues)
 
 
-
-
-    console.log('Downloading package ' + id)
+    console.log('Downloading package ' + packageId)
 
     await download("https://github.com/importshark/assignments/releases/download/publish/excersise-1.0.0.zip", "./exercise.zip")
 
@@ -104,17 +177,31 @@ async function install(id){
 
     extract("./exercise.zip", { dir: `${__dirname}/exercise` })
 
-    console.log(console.log("Unzipped"))
+    console.log("Unzipped")
+
+    let queue = queues.get(id)
+
+    queue.push({name: "finished"})
+
+    queues.set(id, queue);
+
+    queueUpdate()
+
 }
 
 io.on('connection', (socket) => {
+
   socket.on('disconnect', () => {
       console.log('user disconnected');
     });
 
-    socket.on('data', (arg) => {
-              console.log(arg);
-            });
+    socket.on('identify', (arg) => {
+    console.log(clients)
+                  console.log("Socket " + socket.id + "has identified as " + arg);
+                    clients.set(arg, socket)
+                    queueUpdate();
+                });
+
     socket.on('redirect', (arg) => {
         socket.emit("html", fs.readFileSync("./html/assignment.html"));
     });
@@ -127,3 +214,5 @@ server.listen(3000, function(){
 console.log("Loader web app is listening on port 3000.")
 
 })
+
+

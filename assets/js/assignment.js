@@ -2,14 +2,17 @@ let socket = io();
 
 let finished = false;
 
-const id = document.getElementById('id').innerHTML;
+const dataString = document.getElementById('data').value;
+data = JSON.parse(dataString);
 
 const paragraph = document.getElementById('p');
 
 
+socket.emit('identify', data.identification);
 
 socket.on('finish', function (arg) {
-    document.location.href = "/assignment?id=" + id + "&mode=prompt="
+    console.log("The package has been installed successfully")
+    finished = true;
 })
 
 
