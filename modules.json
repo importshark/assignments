@@ -1,0 +1,15 @@
+{
+  "modules": [
+    {
+      "id": 1,
+      "name": 1,
+      "url": "https://github.com/importshark/assignments/releases/download/publish/excersise-1.0.0.zip",
+      "requiredData": {
+        "required": 1,
+        "data": [
+          {"value": "Please enter the amount of dots on one side of the triangle: "}
+        ]
+      }
+    }
+  ]
+}

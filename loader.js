@@ -1,4 +1,4 @@
-throw new Error("IPC listener for socket")
+//throw new Error("IPC listener for socket")
 
 const fs = require('fs');
 const {spawn, spawnSync, fork} = require('child_process');
@@ -15,52 +15,15 @@ var request = require('then-request');;
 const extract = require('extract-zip')
 const fetch = require('node-fetch');
 
+app.set('views','./assets/views');
+
 const clients = new Map();
 
 let queues = new Map();
 
 
-function queueUpdate(){
-console.log('queueUpdate');
+let cacher = require('./cache/cache');
 
-
-
-    for(var [key, value] of clients) {
-
-        if(value === "unknown") continue;
-
-        let socket = value;
-
-
-
-        console.log(key + " has a socket of " + value.id + ".");
-
-            let queue = queues.get(key);
-
-            queue.length > 0 ? console.log(key + " has a queue of " + queue + ".") : console.log(key + " has an empty queue.");
-
-            for(var i = 0; i < queue.length; i++){
-
-                let element = queue[i];
-                if(element.arg){
-
-                    console.log("Emit " + element.name + " on socket " + socket.id + " with arg " + element.arg)
-                    socket.emit(element.name, element.arg);
-
-                }
-                else{
-
-                    console.log("Emit " + element.name + " on socket " + socket.id )
-                    socket.emit(element.name)
-                }
-            }
-
-            clients.set(key, [])
-
-
-
-    }
-}
 
 async function download(url, dest) {
     const response = await fetch(url);
@@ -81,9 +44,17 @@ async function download(url, dest) {
 
 app.set('view engine', 'pug')
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+
+
+const force = req.query.forceReCache
+
+if(force || !cacher.isCached()) await cacher.download();
+
+let data = cacher.getCache();
+
 //res.sendFile("html/index.html", {root: "."})
-res.status(200).render("index", {stuffs: [{name: 1, id: 1},{name: 2, id: 2},{name: 3, id: 3}]})
+res.status(200).render("index", {stuffs: data.modules})
 })
 
 app.get('/assets/js/index.js', (req, res) => {
@@ -118,20 +89,40 @@ app.get('/assignments/', async (req, res) => {
 
     const id = req.query.id
 
+    const force = req.query.forceReCache
+
     let cookie = req.cookies.id;
+
+    cookie ? console.log("Identified user connected.") : console.log("Unidentified user connected.")
 
     let identifier = parseInt(cookie)
 
 
-    let installed = true
+    let cached = cached
 
-    try{
-    let data = JSON.parse(fs.readFileSync("./exercise/module.json"))
-    }catch(e){
-        installed = false
-        console.log("Read/Parse failed with error: " + e)
+    if(force){
+
+    console.log("Caching data as forced")
+
     }
-        console.log(installed)
+    else{
+        try{
+            let data = JSON.parse(fs.readFileSync(`./cache/${id}.json`))
+
+        }catch(e){
+
+            console.log("Caching data....")
+
+             let child = child_process().fork("./cache.js")
+
+             child.on("error", (err) => console.error(err))
+
+        }
+    }
+
+
+
+
 
 
         if(!identifier){
@@ -141,8 +132,11 @@ app.get('/assignments/', async (req, res) => {
         while(clients.has(identifier)) identifier = Math.floor(Math.random() * 1000000)
 
         res.cookie("id", identifier)
+        console.log("Identity " + identifier + " has been assigned to the unknown user")
 
         }
+
+        console.log("A user has connected as " + identifier)
 
         clients.set(identifier, "unknown")
         queues.set(identifier, []);
@@ -162,22 +156,21 @@ app.get('/assignments/', async (req, res) => {
 
 async function install(packageId, id){
 
-console.log(queues)
 
 
-    console.log('Downloading package ' + packageId)
+    console.log('Initiating package download for ' + id + " . Package: " +  packageId)
+
+
+
+
+
 
     await download("https://github.com/importshark/assignments/releases/download/publish/excersise-1.0.0.zip", "./exercise.zip")
 
-    console.log("Package download complete.")
-
-
-    console.log("Unzipping...")
 
 
     extract("./exercise.zip", { dir: `${__dirname}/exercise` })
 
-    console.log("Unzipped")
 
     let queue = queues.get(id)
 
@@ -186,6 +179,7 @@ console.log(queues)
     queues.set(id, queue);
 
     queueUpdate()
+    console.log("Finished")
 
 }
 
@@ -196,14 +190,13 @@ io.on('connection', (socket) => {
     });
 
     socket.on('identify', (arg) => {
-    console.log(clients)
                   console.log("Socket " + socket.id + "has identified as " + arg);
                     clients.set(arg, socket)
                     queueUpdate();
                 });
 
     socket.on('redirect', (arg) => {
-        socket.emit("html", fs.readFileSync("./html/assignment.html"));
+        socket.emit("html", fs.readFileSync("./assets/html/assignment.html"));
     });
   console.log('a user connected at ' + socket.id);
 });
