@@ -266,3 +266,21 @@ let messages =  [
 function random(){
     return messages[Math.floor(Math.random() * messages.length)];
 }
+
+function validate(array, moduleData){
+
+return true;
+
+}
+
+function fade(){
+
+console.log("Fade")
+
+let overlay = document.getElementById("overlay");
+
+
+
+overlay.classList.toggle("backdrop")
+
+}

@@ -1,5 +1,26 @@
 
 
+#overlay {
+	position:absolute;
+	width: 100%;
+	height : 100%;
+	background: #000;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+
+
+	opacity:0;
+	transition: opacity 1s;
+	-moz-transition: opacity 1s;
+	-webkit-transition: opacity 1s;
+}
+
+
+.backdrop {
+	opacity: 1 !important;
+}
+
 .container {
   margin: auto;
   width: 50%;

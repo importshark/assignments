@@ -22,7 +22,7 @@ const clients = new Map();
 let queues = new Map();
 
 
-let cacher = require('./cache/cache');
+let cacher = require('./cache/cache.js');
 
 
 async function download(url, dest) {
@@ -49,7 +49,17 @@ app.get('/', async (req, res) => {
 
 const force = req.query.forceReCache
 
-if(force || !cacher.isCached()) await cacher.download();
+console.log('force cache load: ' + force);
+
+console.log('is cache loaded: ' + cacher.isCached())
+
+if(force || !cacher.isCached()) {
+    console.log("Recaching...")
+    await cacher.download();
+}
+
+
+
 
 let data = cacher.getCache();
 
@@ -67,8 +77,8 @@ res.status(200).sendFile("/assets/js/assignment.js", {root: "."})
 //res.render("index", {data: 1})
 })
 
-app.get('/assets/js/messages.js', (req, res) => {
-res.status(200).sendFile("/assets/js/messages.js", {root: "."})
+app.get('/assets/js/functions.js', (req, res) => {
+res.status(200).sendFile("/assets/js/functions.js", {root: "."})
 //res.render("index", {data: 1})
 })
 
@@ -79,8 +89,15 @@ res.status(200).sendFile("/assets/css/assignment.css", {root: "."})
 
 
 
-app.get('/assets/images/favicon.ico', (req, res) => {
+app.get('/assets/images/favicons/favicon.ico', (req, res) => {
+res.status(200).sendFile("/assets/images/favicons/favicon.ico", {root: "."})
+})
+app.get('/assets/images/favicons/favicon.ico', (req, res) => {
 res.status(200).sendFile("/assets/images/favicon.ico", {root: "."})
+})
+
+app.get('/assets/images/backgroundUpdate.png', (req, res) => {
+res.status(200).sendFile("/assets/images/backgroundUpdate.png", {root: "."})
 })
 
 app.get('/assignments/', async (req, res) => {
@@ -98,31 +115,22 @@ app.get('/assignments/', async (req, res) => {
     let identifier = parseInt(cookie)
 
 
-    let cached = cached
+    let cached = cacher.isCached()
 
-    if(force){
+    if(force || !cacher.isCached()){
 
     console.log("Caching data as forced")
+    await cacher.download()
+
 
     }
-    else{
-        try{
-            let data = JSON.parse(fs.readFileSync(`./cache/${id}.json`))
 
-        }catch(e){
+    const cache = cacher.getCache()
 
-            console.log("Caching data....")
+    //array id is id - 1
 
-             let child = child_process().fork("./cache.js")
-
-             child.on("error", (err) => console.error(err))
-
-        }
-    }
-
-
-
-
+    //assign data
+    const data = cache.modules[id - 1]
 
 
         if(!identifier){
@@ -138,14 +146,13 @@ app.get('/assignments/', async (req, res) => {
 
         console.log("A user has connected as " + identifier)
 
-        clients.set(identifier, "unknown")
-        queues.set(identifier, []);
-
-        if(!installed) await install(id, identifier)
 
 
 
-            return res.render('assignment', {data: { id: id, identification: identifier} })
+
+
+
+            return res.render('assignment', {data: { id: id, identification: identifier, moduleData: data} })
 
 
     
@@ -192,7 +199,6 @@ io.on('connection', (socket) => {
     socket.on('identify', (arg) => {
                   console.log("Socket " + socket.id + "has identified as " + arg);
                     clients.set(arg, socket)
-                    queueUpdate();
                 });
 
     socket.on('redirect', (arg) => {
