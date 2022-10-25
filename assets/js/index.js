@@ -6,5 +6,6 @@ document = data
 })
 
 function redirect(id){
+
     document.location.href = "/assignments/?id=" + id
 }

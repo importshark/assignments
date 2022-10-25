@@ -10,7 +10,8 @@
           {
             "value": "Please enter the amount of dots on one side of the triangle: ",
             "id": 0,
-            "type": "integer"
+            "type": "integer",
+            "required": true
           }
         ]
       }

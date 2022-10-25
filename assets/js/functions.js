@@ -268,6 +268,28 @@ function random(){
 }
 
 function validate(array, moduleData){
+console.log(array);
+console.log(moduleData);
+
+for(var i = 0; i < array.length; i++) {
+    //get the validator
+
+    let validator = moduleData.requiredData.data[i].type
+
+    switch(validator) {
+
+        case 'all':
+            continue;
+            break;
+        case 'integer':
+            if(parseInt(array[i])) continue;
+            return i;
+            break;
+
+    }
+
+
+}
 
 return true;
 
