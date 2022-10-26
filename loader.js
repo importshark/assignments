@@ -26,7 +26,7 @@ app.set('views', './assets/views');
 
 
 
-function getKey(map, value){
+function getKey(map, searchValue){
      for (let [key, value] of map.entries()) {
         if (value === searchValue)
           return key;
@@ -68,7 +68,7 @@ function testInterface(socket){
     })
 }
 
-async function update(){
+async function runFirst(){
 
 
     //get the first user in the queue
@@ -99,6 +99,35 @@ async function update(){
                 socket.emit('childStderr', data);
             })
 
+
+}
+
+function getIndex(socket){
+
+    let value = userQueue.find(x => x.id === socket.id)
+
+    return userQueue.indexOf(value)
+}
+
+async function queueUpdate(){
+
+    for( let [key, value] of sockets.map){
+        let valid = await testInterface(value);
+
+        if(!valid){
+            console.log("qu invalid " + value.id)
+            sockets.map.delete(key);
+
+        }
+
+        value.emit('queueUpdate', getIndex(value));
+
+
+    }
+
+    console.log("Begin run of package for user " + map.getKey(map.map, userQueue[0].id))
+
+    runFirst();
 
 }
 
@@ -222,10 +251,10 @@ io.on('connection', async (socket) => {
         map.map.set(arg, socket)
     });
 
-    socket.on('ready', (arg) => {
+    socket.on('ready', async (arg) => {
         console.log("Socket " + socket.id + "has readied with args " + arg);
         userQueue.push({id: socket.id, args: arg})
-        update()
+        await queueUpdate()
     });
 
     socket.on('redirect', (arg) => {

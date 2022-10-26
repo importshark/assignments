@@ -147,12 +147,16 @@ socket.emit('identify', data.identification);
 
 
 //socket events
+socket.on('queueUpdate', function(arg){
+    header.innerHTML = `You are #${arg} in the queue.`
+})
+
 socket.on('finish', function (arg) {
     console.log("The package has been installed successfully")
     finished = true;
 })
 
-socket.emit('runStart', function () {
+socket.on('runStart', function () {
     console.log("The package is starting")
 })
 
