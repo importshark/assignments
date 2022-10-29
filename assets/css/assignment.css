@@ -1,4 +1,8 @@
 
+textarea {
+    resize: none;
+    overflow: scroll; /* Horizontal and vertical scrollbar*/
+}
 
 #overlay {
 	position:absolute;

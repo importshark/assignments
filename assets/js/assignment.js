@@ -6,7 +6,7 @@ if ( window.location !== window.parent.location ) {
 //INITIALIZE VARS
 let socket = io();
 let waiting = false;
-
+let doRandom = false;
 function sleep(milliseconds) {
   const date = Date.now();
   let currentDate = null;
@@ -20,6 +20,8 @@ function sleep(milliseconds) {
 
 //document vars
 const dataElement = document.getElementById('data')
+const home = document.getElementById('homeBtn')
+const textArea = document.getElementById('logArea')
 const paragraph = document.getElementById('p');
 const header = document.getElementById('header');
 const anim_holder = document.getElementById('animation_holder');
@@ -35,6 +37,8 @@ console.log(data)
 paragraph.hidden = true;
 header.hidden = true;
 anim_holder.hidden = true;
+home.hidden = true;
+textArea.hidden = true;
 
 let form = document.createElement('form');
 
@@ -142,26 +146,43 @@ return false;
 
 
 
-//identify socket
-socket.emit('identify', data.identification);
-
 
 //socket events
 socket.on('queueUpdate', function(arg){
     header.innerHTML = `You are #${arg} in the queue.`
+    doRandom = false;
+    if(arg == 0) paragraph.innerHTML = "You should get a confirmation that the package is starting in the next few seconds."
 })
 
 socket.on('finish', function (arg) {
     console.log("The package has been installed successfully")
     finished = true;
+    doRandom = true;
+})
+socket.on('close', function (arg) {
+    console.log("Child closed.")
+    finished = true;
+    doRandom = false;
+
+
+    socket.close();
+
+    header.innerHTML = "The script has finished running. To restart or run another script, please click below."
+
+    home.hidden = false;
+
 })
 
 socket.on('runStart', function () {
     console.log("The package is starting")
+    textArea.hidden = false;
 })
 
 socket.on('childStdout', function (arg) {
-    console.log("Child stdout! " + String.fromCharCode.apply(null, new Int8Array(arg)))
+
+    let data = String.fromCharCode.apply(null, new Int8Array(arg))
+    console.log("Child stdout! " + data)
+    textArea.innerHTML += data + "\n"
 })
 
 socket.on('testInitiate', function (arg) {
@@ -182,6 +203,6 @@ setInterval(function () {
     paragraph.hidden = false;
     anim_holder.hidden = false;
     header.hidden = false;
-    paragraph.innerHTML = random();
+    if(doRandom) paragraph.innerHTML = random();
 
 }, 3750)
