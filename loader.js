@@ -232,7 +232,7 @@ app.get('/assets/images/backgroundUpdate.png', (req, res) => {
     })
 })
 
-server.listen(3000, function() {
+server.listen(25565, function() {
     console.log("Loader web app is listening on port 3000.")
 
 })
