@@ -2,7 +2,8 @@
   "modules": [
     {
       "id": 1,
-      "name": 1,
+      "name": "1: Triangle dot counter",
+      "description": "This is a simple project to calculate the number of dots in a triangle based off the dots on one side of the triangle(right or left(essentially it's the height of the triangle))",
       "url": "https://github.com/importshark/assignments/releases/download/publish/excersise-1.0.0.zip",
       "requiredData": {
         "required": 1,
@@ -13,6 +14,23 @@
             "type": "integer",
             "required": true
           }
+          },
+          {
+            "id": 2,
+            "name": "2: Salary Calculator",
+            "description": "This project calculates the salary for a given work week. More info below.",
+            "helpPages": ["/help?project=2"],
+            "url": "https://github.com/importshark/assignments/releases/download/publish/excersise-1.0.0.zip",
+            "requiredData": {
+              "required": 1,
+              "data": [
+                {
+                  "value": "Please enter the amount of hours worked on Sunday: ",
+                  "id": 0,
+                  "type": "integer",
+                  "validator": "<=24",
+                  "required": true
+                }
         ]
       }
     }

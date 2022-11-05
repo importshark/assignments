@@ -54,24 +54,49 @@ async function runFirst(){
     //get the first user in the queue
         let {id, args} = sm.getFirst();
 
+        let {modules} = require('./cache/cache.json');
+
         args.unshift("main.js")
 
 
-        sm.send(id, "runStart")
+        sm.send(id, "runInit")
 
-        const child = spawn("node", args, { cwd: "./exercise/"})
+        try{
+            let packageData = require("/exercise/module.json")
+        }catch(err){
+            //Install package
 
-        child.stdout.on('data', function(data){
-            sm.send(id, 'childStdout', data);
-        })
+            request('GET', modules[args[0]].url).done(function (res) {
+              console.log(res.getBody());
 
-        child.stderr.on('data', function(data){
-                sm.send(id, 'childStderr', data);
-            })
-            child.on('close', function(code){
-                currentlyRunning = false;
-                sm.finish(id);
-            })
+                try{
+                 fs.writeFileSync("./exercise/exercise.zip", res.GetBody())
+                }catch(e){
+                    console.log(e)
+
+                    sm.send(id, "runFail")
+
+                }
+
+              const child = spawn("node", args, { cwd: "./exercise/"})
+
+                      child.stdout.on('data', function(data){
+                          sm.send(id, 'childStdout', data);
+                      })
+
+                      child.stderr.on('data', function(data){
+                              sm.send(id, 'childStderr', data);
+                          })
+                          child.on('close', function(code){
+                              currentlyRunning = false;
+                              sm.finish(id);
+                          })
+            });
+
+        }
+
+
+
 
 
 }
@@ -232,7 +257,7 @@ app.get('/assets/images/backgroundUpdate.png', (req, res) => {
     })
 })
 
-server.listen(25565, function() {
+server.listen(3000, function() {
     console.log("Loader web app is listening on port 3000.")
 
 })

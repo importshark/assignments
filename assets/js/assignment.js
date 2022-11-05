@@ -21,7 +21,7 @@ function sleep(milliseconds) {
 //document vars
 const dataElement = document.getElementById('data')
 const home = document.getElementById('homeBtn')
-const textArea = document.getElementById('logArea')
+const textArea = document.getElementById('console')
 const paragraph = document.getElementById('p');
 const header = document.getElementById('header');
 const anim_holder = document.getElementById('animation_holder');
@@ -99,7 +99,7 @@ document.body.appendChild(form);
 //Create necessary functions for page
 function submit() {
 
-let array = [];
+let array = [moduleData.id];
 
 for (let i = 0; i < moduleData.requiredData.data.length; i++) {
     let element = document.getElementById(moduleData.requiredData.data[i].id);

@@ -1,3 +1,5 @@
+<script src="https://unpkg.com/validator@latest/validator.min.js"></script>
+
 let messages =  [
                  "Reticulating splines...",
                  "Generating witty dialog...",
@@ -267,34 +269,39 @@ function random(){
     return messages[Math.floor(Math.random() * messages.length)];
 }
 
-function validate(array, moduleData){
-console.log(array);
-console.log(moduleData);
+function validate(array, moduleData) {
 
-for(var i = 0; i < array.length; i++) {
-    //get the validator
+    let errors = [];
 
-    let validator = moduleData.requiredData.data[i].type
 
-    switch(validator) {
+    for (var i = 0; i < array.length; i++) {
 
-        case 'all':
-            continue;
-            break;
-        case 'integer':
-            if(parseInt(array[i])) continue;
-            return i;
-            break;
+        let {
+            required,
+            type,
+            validator
+        } = moduleData.requiredData.data[i]
 
+        if (!required) continue;
+
+        switch (type) {
+
+            case "integer":
+                if (!validator.isInt(array[i])) errors.push({
+                    index: i,
+                    message: "Invalid integer"
+                })
+                continue;
+                break;
+            case "string":
+                continue;
+                break;
+
+        }
     }
 
 
 }
-
-return true;
-
-}
-
 function fade(){
 
 console.log("Fade")
