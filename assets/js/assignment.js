@@ -25,6 +25,7 @@ const textArea = document.getElementById('console')
 const paragraph = document.getElementById('p');
 const header = document.getElementById('header');
 const anim_holder = document.getElementById('animation_holder');
+const description = document.getElementById('description');
 
 //interpret vars, if required
 const data = JSON.parse(dataElement.value);
@@ -39,6 +40,7 @@ header.hidden = true;
 anim_holder.hidden = true;
 home.hidden = true;
 textArea.hidden = true;
+description.innerHTML = moduleData.description
 
 let form = document.createElement('form');
 

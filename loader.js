@@ -20,7 +20,7 @@ const extract = require('extract-zip')
 const fetch = require('node-fetch');
 const sm = require('./sm/socketManager')
 let cacher = require('./cache/cache.js');
-const events = require('events')
+const zip = require("@zip.js/zip.js/index.cjs");
 
 app.set('views', './assets/views');
 app.set('view engine', 'pug')
@@ -56,6 +56,11 @@ async function runFirst(){
 
         let {modules} = require('./cache/cache.json');
 
+        let module = modules.find(m => m.id === args[0]);
+
+
+        console.log(module)
+
         args.unshift("main.js")
 
 
@@ -63,14 +68,18 @@ async function runFirst(){
 
         try{
             let packageData = require("/exercise/module.json")
+
+            if(packageData.id != args[0]) throw new Error("Incorrect package. Downloading new one.")
+
+
         }catch(err){
             //Install package
 
-            request('GET', modules[args[0]].url).done(function (res) {
-              console.log(res.getBody());
+            request('GET', module.url).done(function (res) {
+              let body = res.getBody()
 
                 try{
-                 fs.writeFileSync("./exercise/exercise.zip", res.GetBody())
+                 fs.writeFileSync(".    /exercise.zip", body)
                 }catch(e){
                     console.log(e)
 

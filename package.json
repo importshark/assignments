@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@zip.js/zip.js": "^2.6.52",
     "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
     "extract-zip": "^2.0.1",

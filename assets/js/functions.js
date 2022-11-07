@@ -1,4 +1,4 @@
-<script src="https://unpkg.com/validator@latest/validator.min.js"></script>
+
 
 let messages =  [
                  "Reticulating splines...",
@@ -273,13 +273,15 @@ function validate(array, moduleData) {
 
     let errors = [];
 
+    return errors;
+
 
     for (var i = 0; i < array.length; i++) {
 
         let {
             required,
             type,
-            validator
+            regex
         } = moduleData.requiredData.data[i]
 
         if (!required) continue;
