@@ -21,8 +21,6 @@ const fetch = require('node-fetch');
 const sm = require('./sm/socketManager')
 let cacher = require('./cache/cache.js');
 var events = require("events");
-const { EventEmitter } = require('stream');
-const { emit } = require('process');
 app.set('views', './assets/views');
 app.set('view engine', 'pug')
 
@@ -46,28 +44,57 @@ async function download(url, dest) {
 }
 
 
+function run(data){
+
+    const {id, args} = data;
+
+                  const child = spawn("node", args, { cwd: "./exercise/"})
+
+                          child.stdout.on('data', function(data){
+                              sm.send(id, 'childStdout', data);
+                          })
+
+                          child.on("error", function(err){
+
+                            sm.send(id, 'childError', err)
+
+                          })
+
+                          child.stderr.on('data', function(data){
+                                  sm.send(id, 'childStderr', data);
+                              })
+                              child.on('close', function(code){
+                                  currentlyRunning = false;
+                                  sm.finish(id);
+                              })
+}
 
 
 
-
-async function runFirst(){
+async function initiateRun(){
 
 
 
     //get the first user in the queue
-        let {id, args} = sm.getFirst();
+    console.log("run")
+        let data = sm.getFirst();
 
         let {modules} = require('./cache/cache.json');
 
-        let module = modules.filter(function(m){ m.id === args[0]}  );
+        let module = modules[data.args[0]]
+
+        console.log(module)
 
 
-        
-
-        args.unshift("main.js")
 
 
-        sm.send(id, "runInit")
+
+        sm.send(data.id, "runInit")
+
+
+
+        data.args.shift(); //remove package id
+        data.args.unshift("main.js")
 
         let moduleFile = false;
 
@@ -76,49 +103,31 @@ async function runFirst(){
         
     try{
         moduleFile = JSON.parse(fs.readFileSync("./exercise/module.json"))
+        console.log(!moduleFile.id)
+        if(!moduleFile.id) throw new Error("Incorrect package")
         if(moduleFile.id != module.id) throw new Error("Incorrect package")
     }    
     catch(err){
 
-    
-        
+
+
+            err ? console.error(err) : console.log("No error")
 
         
-            const emitter = install(id, module.id)  
+            const emitter = install(module)
             emitter.on("done", function(){
 
                 console.log("Can anybody hear me")
                 
-    
-            
-    
-                //Install package
+            return run(data)
     
                
     
-        
-                  const child = spawn("node", args, { cwd: "./exercise/"})
-    
-                          child.stdout.on('data', function(data){
-                              sm.send(id, 'childStdout', data);
-                          })
-    
-                          child.on("error", function(err){
-    
-                            sm.send(id, 'childError', err)
-    
-                          })
-    
-                          child.stderr.on('data', function(data){
-                                  sm.send(id, 'childStderr', data);
-                              })
-                              child.on('close', function(code){
-                                  currentlyRunning = false;
-                                  sm.finish(id);
-                              })
+
 
             })
-        }      
+        }
+        run(data)
         
            
             };
@@ -175,17 +184,14 @@ app.get('/assignments/', async (req, res) => {
 })
 
 
-function install(packageId, id) {
+function install(module) {
 
     const emitter = new events.EventEmitter();
 
 
-    console.log('Initiating package download for ' + id + " . Package: " + packageId)
+    console.log("Here")
 
-    let {modules} = cacher.getCache();
-
-    let module = modules.find(x => x.id = packageId)
-
+    console.log(module)
 
     request('GET', module.url).done(function (res) {
         let body = res.getBody()
@@ -315,9 +321,10 @@ setInterval(() => {
 
    let data = sm.getFirst()
 
+
     if(!data) return
     if(data.id === currentlyRunning) return
 
-    runFirst()
+    initiateRun()
 
 }, 5000)

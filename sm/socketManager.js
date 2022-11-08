@@ -8,8 +8,8 @@ function getKey(map, searchValue){
       }
 }
 
-function getValue(map, key){
-    return map.get(key)
+function getValue(key){
+    return sockets.map.get(key)
 }
 
 
@@ -80,7 +80,7 @@ function connect(socket){
 
 }
 function getSocket(id){
-    return sockets.getValue(sockets.map, id)
+    return sockets.getValue(id)
 }
 function getFirst(){
     return userQueue[0]
@@ -88,13 +88,8 @@ function getFirst(){
 
 function finish(id){
 
-    if(!userQueue[0]) throw new Error("Help")
 
-    if(id != userQueue[0].id){
-        throw new Error("Help me")
-    }
-
-    let socket = sockets.getValue(sockets.map, id)
+    let socket = sockets.getValue(id)
 
     socket.emit('close')
 
@@ -102,7 +97,7 @@ function finish(id){
     userQueue.shift()
 
     for(var i = 0; i < userQueue.length; i++){
-        let socket = sockets.getValue(sockets.map, userQueue[i].id)
+        let socket = sockets.getValue(userQueue[i].id)
 
         socket.emit('queueUpdate', i)
 
@@ -115,7 +110,19 @@ function finish(id){
 }
 function send(id, event, data){
 
-    let socket = sockets.getValue(sockets.map, id);
+
+
+    let socket = sockets.map.get(id);
+
+    if(!socket){
+        console.error(id + " seems to be missing.")
+        sockets.map.delete(id)
+        return;
+    }
+
+    socket.emit(event, data);
+
+
 
     socket.emit(event, data);
 }
@@ -130,19 +137,12 @@ module.exports = {connect, getIndex, getSocket, getFirst, send, finish}
 
 
 
-async function queueUpdate(){
+function queueUpdate(){
 
 
 
     for( let [key, value] of sockets.map){
-        let valid = await testInterface(value);
 
-        if(!valid){
-            console.log("qu invalid " + value.id)
-            sockets.map.delete(key);
-            continue;
-
-        }
 
         value.emit('queueUpdate', getIndex(value));
 
@@ -151,26 +151,8 @@ async function queueUpdate(){
 
     if(!userQueue[0]) return;
 
-    console.log("Begin run of package for user " + userQueue[0].id)
-
 
 
 }
-
-
-setInterval(async function(){
-
-    for( let [key, value] of sockets.map){
-        let valid = await testInterface(value);
-
-        if(!valid){
-            console.log("Socket " + key + " is invalid")
-            disconnect(value)
-        }
-
-
-    }
-
-}, 10000)
 
 
