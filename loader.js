@@ -74,11 +74,16 @@ async function runFirst(){
         
         
         
+    try{
+        moduleFile = JSON.parse(fs.readFileSync("./exercise/module.json"))
+        if(moduleFile.id != module.id) throw new Error("Incorrect package")
+    }    
+    catch(err){
+
+    
         
 
         
-
-        if(!fs.existsSync("./exercise/module.json")) {
             const emitter = install(id, module.id)  
             emitter.on("done", function(){
 
