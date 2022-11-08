@@ -21,9 +21,6 @@
             "id": 2,
             "name": "2: Salary Calculator",
             "description": "This project calculates the salary for a given work week. More info below.",
-            "helpPages": [
-              "/help?project=2"
-            ],
             "url": "https://github.com/importshark/assignments/releases/download/publish/excersise-1.zip",
             "requiredData": {
               "required": 1,

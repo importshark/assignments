@@ -20,10 +20,12 @@ const extract = require('extract-zip')
 const fetch = require('node-fetch');
 const sm = require('./sm/socketManager')
 let cacher = require('./cache/cache.js');
-const zip = require("@zip.js/zip.js/index.cjs");
-
+var events = require("events");
+const { EventEmitter } = require('stream');
+const { emit } = require('process');
 app.set('views', './assets/views');
 app.set('view engine', 'pug')
+
 
 let currentlyRunning = false;
 
@@ -51,64 +53,78 @@ async function download(url, dest) {
 async function runFirst(){
 
 
+
     //get the first user in the queue
         let {id, args} = sm.getFirst();
 
         let {modules} = require('./cache/cache.json');
 
-        let module = modules.find(m => m.id === args[0]);
+        let module = modules.filter(function(m){ m.id === args[0]}  );
 
 
-        console.log(module)
+        
 
         args.unshift("main.js")
 
 
         sm.send(id, "runInit")
 
-        try{
-            let packageData = require("/exercise/module.json")
+        let moduleFile = false;
 
-            if(packageData.id != args[0]) throw new Error("Incorrect package. Downloading new one.")
+        
+        
+        
+        
 
+        
 
-        }catch(err){
-            //Install package
+        if(!fs.existsSync("./exercise/module.json")) {
+            const emitter = install(id, module.id)  
+            emitter.on("done", function(){
 
-            request('GET', module.url).done(function (res) {
-              let body = res.getBody()
-
-                try{
-                 fs.writeFileSync(".    /exercise.zip", body)
-                }catch(e){
-                    console.log(e)
-
-                    sm.send(id, "runFail")
-
-                }
-
-              const child = spawn("node", args, { cwd: "./exercise/"})
-
-                      child.stdout.on('data', function(data){
-                          sm.send(id, 'childStdout', data);
-                      })
-
-                      child.stderr.on('data', function(data){
-                              sm.send(id, 'childStderr', data);
+                console.log("Can anybody hear me")
+                
+    
+            
+    
+                //Install package
+    
+               
+    
+        
+                  const child = spawn("node", args, { cwd: "./exercise/"})
+    
+                          child.stdout.on('data', function(data){
+                              sm.send(id, 'childStdout', data);
                           })
-                          child.on('close', function(code){
-                              currentlyRunning = false;
-                              sm.finish(id);
+    
+                          child.on("error", function(err){
+    
+                            sm.send(id, 'childError', err)
+    
                           })
-            });
+    
+                          child.stderr.on('data', function(data){
+                                  sm.send(id, 'childStderr', data);
+                              })
+                              child.on('close', function(code){
+                                  currentlyRunning = false;
+                                  sm.finish(id);
+                              })
 
-        }
+            })
+        }      
+        
+           
+            };
+
+        
 
 
 
 
 
-}
+
 
 app.get('/assignments/', async (req, res) => {
 
@@ -154,22 +170,41 @@ app.get('/assignments/', async (req, res) => {
 })
 
 
-async function install(packageId, id) {
+function install(packageId, id) {
 
+    const emitter = new events.EventEmitter();
 
 
     console.log('Initiating package download for ' + id + " . Package: " + packageId)
 
+    let {modules} = cacher.getCache();
+
+    let module = modules.find(x => x.id = packageId)
 
 
+    request('GET', module.url).done(function (res) {
+        let body = res.getBody()
 
-    await download("https://github.com/importshark/assignments/releases/download/publish/excersise-1.0.0.zip", "./exercise.zip")
+          try{
+           fs.writeFileSync("./exercise.zip", body)
+          }catch(e){
+              console.log(e)
+
+              throw new Error(e)
+
+          }
+
+          extract("./exercise.zip", {
+            dir: `${__dirname}/exercise`
+        })
+          
+        emitter.emit("done")
+  })
+
+  return emitter;
 
 
-
-    extract("./exercise.zip", {
-        dir: `${__dirname}/exercise`
-    })
+    
 
 
 

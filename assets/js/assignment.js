@@ -161,6 +161,13 @@ socket.on('finish', function (arg) {
     finished = true;
     doRandom = true;
 })
+
+socket.on("childError", function(err){
+
+console.error(err)
+
+})
+
 socket.on('close', function (arg) {
     console.log("Child closed.")
     finished = true;
