@@ -4,6 +4,9 @@ const {
     spawnSync,
     fork
 } = require('child_process');
+
+var android = require('node-on-android')
+
 //const {spawnArgs, nodePath} = require('./loaderData.json')
 const http = require('http');
 const express = require('express');
@@ -43,30 +46,51 @@ async function download(url, dest) {
     });
 }
 
+function test(module){
+    try{
+        let moduleFile = JSON.parse(fs.readFileSync("./exercise/module.json"))
+        if(!moduleFile.id) throw new Error("Incorrect package")
+        if(moduleFile.id != module.id) throw new Error("Incorrect package")
+        }catch(err){
+                return err;
+            }
+            return "continue";
+}
 
-function run(data){
+function run(){
+
+    let data = sm.getFirst();
 
     const {id, args} = data;
 
-                  const child = spawn("node", args, { cwd: "./exercise/"})
+    let {modules} = require('./cache/cache.json');
 
-                          child.stdout.on('data', function(data){
-                              sm.send(id, 'childStdout', data);
-                          })
+            let module = modules[data.args[0] - 1]
 
-                          child.on("error", function(err){
+            console.log(module)
 
-                            sm.send(id, 'childError', err)
 
-                          })
 
-                          child.stderr.on('data', function(data){
-                                  sm.send(id, 'childStderr', data);
-                              })
-                              child.on('close', function(code){
-                                  currentlyRunning = false;
-                                  sm.finish(id);
-                              })
+
+    const child = spawn("node", args, { cwd: "./exercise/"})
+
+        child.stdout.on('data', function(data){
+            sm.send(id, 'childStdout', data);
+            })
+
+        child.on("error", function(err){
+
+            sm.send(id, 'childError', err)
+
+        })
+
+        child.stderr.on('data', function(data){
+            sm.send(id, 'childStderr', data);
+            })
+        child.on('close', function(code){
+            currentlyRunning = false;
+            sm.finish(id);
+            })
 }
 
 
@@ -77,13 +101,9 @@ async function initiateRun(){
 
     //get the first user in the queue
     console.log("run")
-        let data = sm.getFirst();
 
-        let {modules} = require('./cache/cache.json');
 
-        let module = modules[data.args[0]]
 
-        console.log(module)
 
 
 
@@ -98,41 +118,35 @@ async function initiateRun(){
 
         let moduleFile = false;
 
-        
-        
-        
+
+
+
     try{
         moduleFile = JSON.parse(fs.readFileSync("./exercise/module.json"))
         console.log(!moduleFile.id)
         if(!moduleFile.id) throw new Error("Incorrect package")
         if(moduleFile.id != module.id) throw new Error("Incorrect package")
-    }    
+    }
     catch(err){
 
-
+            if(err){
+               sm.send(data.id, "downloadStart")
+               spawn
+            }else{
+                sm.send(data.id, "beginRun")
+            }
 
             err ? console.error(err) : console.log("No error")
 
-        
-            const emitter = install(module)
-            emitter.on("done", function(){
-
-                console.log("Can anybody hear me")
-                
-            return run(data)
-    
-               
-    
 
 
-            })
+
         }
-        run(data)
-        
-           
+
+
             };
 
-        
+
 
 
 
@@ -208,14 +222,14 @@ function install(module) {
           extract("./exercise.zip", {
             dir: `${__dirname}/exercise`
         })
-          
+
         emitter.emit("done")
   })
 
   return emitter;
 
 
-    
+
 
 
 
@@ -314,6 +328,7 @@ app.get('/assets/images/backgroundUpdate.png', (req, res) => {
 
 server.listen(3000, function() {
     console.log("Loader web app is listening on port 3000.")
+    android.loadUrl(`http://localhost:3000`)
 
 })
 
