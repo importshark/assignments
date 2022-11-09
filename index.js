@@ -5,7 +5,6 @@ const {
     fork
 } = require('child_process');
 
-var android = require('node-on-android')
 
 //const {spawnArgs, nodePath} = require('./loaderData.json')
 const http = require('http');
@@ -328,7 +327,6 @@ app.get('/assets/images/backgroundUpdate.png', (req, res) => {
 
 server.listen(3000, function() {
     console.log("Loader web app is listening on port 3000.")
-    android.loadUrl(`http://localhost:3000`)
 
 })
 
