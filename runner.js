@@ -54,7 +54,7 @@ function run(data){
 
 
 
-function initiateRun(data, module){
+async function initiateRun(data, module){
 
 
 
@@ -89,7 +89,7 @@ function initiateRun(data, module){
             if(err){
                sm.send(data.id, "downloadStart")
                let out = fs.createWriteStream("./out.txt")
-               const download = fork("./download.js", [module.url, data.id], {stdio: "ignore", detached: true})
+               const download = fork("./download.js", [module.url], {stdio: "ignore", detached: true})
                download.on("close", function() {sm.send(data.id, 'downloadFinish')})
                download.unref();
                return false;

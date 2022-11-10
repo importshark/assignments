@@ -18,6 +18,7 @@ function sleep(milliseconds) {
 
 
 
+
 //document vars
 const dataElement = document.getElementById('data')
 const home = document.getElementById('homeBtn')
@@ -30,6 +31,8 @@ const description = document.getElementById('description');
 //interpret vars, if required
 const data = JSON.parse(dataElement.value);
 const {moduleData} = data;
+
+const array = [moduleData.id];
 
 //debug variables
 console.log(data)
@@ -96,19 +99,24 @@ form.appendChild(button)
 document.body.appendChild(form);
 
 
+function data(){
 
+    for (let i = 0; i < moduleData.requiredData.data.length; i++) {
+        let element = document.getElementById(moduleData.requiredData.data[i].id);
+    
+        array.push(element.value);
+    
+    }
+
+}
 
 //Create necessary functions for page
 function submit() {
 
-let array = [moduleData.id];
+    data()
 
-for (let i = 0; i < moduleData.requiredData.data.length; i++) {
-    let element = document.getElementById(moduleData.requiredData.data[i].id);
 
-    array.push(element.value);
 
-}
 
 let valid = validate(array, moduleData)
 if(valid){
@@ -171,7 +179,7 @@ socket.on("childError", function(err){
 socket.on("downloadStart", function(){
 
     console.log("download has begun.")
-    paragraph.innerHTML = "The package is downloading..."
+    paragraph.innerHTML = "Download has started"
         
     })
 
@@ -185,14 +193,8 @@ socket.on("downloadFinish", function(){
 
             console.log("download has finished.")
 
-            const array = []
-
-            for (let i = 0; i < moduleData.requiredData.data.length; i++) {
-                let element = document.getElementById("div" + moduleData.requiredData.data[i].id);
+            console.log(array)
             
-                array.push(element.value)
-            
-            }
             
             
             socket.emit("ready", array);
