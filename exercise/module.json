@@ -1,11 +1,33 @@
 {
-  "path": "D:\\Projects\\assignments\\exercises\\1",
-  "mainFile": "main.js",
+  "id": 2,
   "requiredData": {
-    "required": 1,
+    "required": 7,
     "data": [
-      {"value": "Please enter the amount of dots on one side of the triangle: "}
+      {
+        "name":  "integer",
+        "value": "Please enter hours worked on Monday: "
+      },{
+        "name":  "integer",
+        "value": "Please enter hours worked on Tuesday: "
+      },{
+        "name":  "integer",
+        "value": "Please enter hours worked on Wednesday: "
+      },{
+        "name":  "integer",
+        "value": "Please enter hours worked on Thursday: "
+      },{
+        "name":  "integer",
+        "value": "Please enter hours worked on Friday: "
+      },{
+        "name":  "integer",
+        "value": "Please enter hours worked on Saturday: "
+      },{
+        "name":  "integer",
+        "value": "Please enter hours worked on Sunday: "
+      }
     ]
-  }
+  },
+  "path": "D:\\Projects\\assignments\\exercises\\2",
+  "mainFile": "main.js"
 
 }

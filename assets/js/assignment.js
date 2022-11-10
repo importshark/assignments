@@ -164,9 +164,15 @@ socket.on('finish', function (arg) {
 
 socket.on("childError", function(err){
 
-console.error(err)
+    console.error(err)
+    
+    })
 
-})
+socket.on("downloadStart", function(){
+
+    console.log("download has begun.")
+        
+    })
 
 socket.on('close', function (arg) {
     console.log("Child closed.")

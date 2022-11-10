@@ -1,5 +1,5 @@
 const { spawnSync } = require('child_process');
-
+const runner = require("../runner")
 
 function getKey(map, searchValue){
      for (let [key, value] of map.entries()) {
@@ -65,9 +65,13 @@ function connect(socket){
 
 
         socket.on('ready', async (arg) => {
+
+            const data = {id: socket.id, args: arg}
+
             console.log("Socket " + socket.id + "has readied with args " + arg);
-            userQueue.push({id: socket.id, args: arg})
+            userQueue.push(data)
             await queueUpdate()
+            runner.run(data)
         });
 
         socket.on('redirect', (arg) => {
@@ -128,9 +132,10 @@ function send(id, event, data){
 }
 
 
+exports.send = send;
+exports.finish = finish;
 
-
-module.exports = {connect, getIndex, getSocket, getFirst, send, finish}
+module.exports = {connect, getIndex, getSocket, getFirst}
 
 
 
