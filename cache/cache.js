@@ -3,7 +3,7 @@ const fs = require('fs');
 
 
 async function download(url, dest) {
-    const response = await fetch("https://github.com/importshark/assignments/releases/download/publish/modules.json");
+    const response = await fetch("https://github.com/importshark/assignments/releases/download/pre-alpha/modules.json");
     const file = fs.createWriteStream("./cache/cache.json");
     return new Promise((resolve, reject) => {
         response.body.pipe(file);

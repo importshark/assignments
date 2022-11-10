@@ -26,7 +26,8 @@ function run(data){
 
             console.log(module)
 
-            initiateRun(data, module)
+            let ready = initiateRun(data, module)
+            if(!ready) return;
 
 
 
@@ -53,7 +54,7 @@ function run(data){
 
 
 
-async function initiateRun(data, module){
+function initiateRun(data, module){
 
 
 
@@ -88,10 +89,8 @@ async function initiateRun(data, module){
             if(err){
                sm.send(data.id, "downloadStart")
                let out = fs.createWriteStream("./out.txt")
-               const download = fork("./download.js", [module.url], {stdio: [out, out, "ipc"], detached: true})
+               const download = fork("./download.js", [module.url, data.id], {stdio: "ignore", detached: true})
                download.on("close", function() {sm.send(data.id, 'downloadFinish')})
-               download.stdout.pipe(out);
-               download.stderr.pipe(out);
                download.unref();
                return false;
             }

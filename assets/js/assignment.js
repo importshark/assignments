@@ -171,8 +171,32 @@ socket.on("childError", function(err){
 socket.on("downloadStart", function(){
 
     console.log("download has begun.")
+    paragraph.innerHTML = "The package is downloading..."
         
     })
+
+socket.on("downloadError", function(err){
+
+    console.log("download has errored with err " + err + " .")
+            
+})
+
+socket.on("downloadFinish", function(){
+
+            console.log("download has finished.")
+
+            const array = []
+
+            for (let i = 0; i < moduleData.requiredData.data.length; i++) {
+                let element = document.getElementById("div" + moduleData.requiredData.data[i].id);
+            
+                array.push(element.value)
+            
+            }
+            
+            
+            socket.emit("ready", array);
+            })
 
 socket.on('close', function (arg) {
     console.log("Child closed.")

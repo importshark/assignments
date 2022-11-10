@@ -4,7 +4,7 @@
       "id": 1,
       "name": "1: Triangle dot counter",
       "description": "This is a simple project to calculate the number of dots in a triangle based off the dots on one side of the triangle(right or left(essentially it's the height of the triangle))",
-      "url": "https://github.com/importshark/assignments/releases/download/publish/excersise-1.zip",
+      "url": "https://github.com/importshark/assignments/releases/download/pre-alpha/exercise-1.zip",
       "requiredData": {
         "required": 1,
         "data": [
@@ -21,7 +21,7 @@
             "id": 2,
             "name": "2: Salary Calculator",
             "description": "This project calculates the salary for a given work week. More info below.",
-            "url": "https://github.com/importshark/assignments/releases/download/publish/excersise-1.zip",
+            "url": "https://github.com/importshark/assignments/releases/download/pre-alpha/exercise-2.zip",
             "requiredData": {
               "required": 1,
               "data": [
