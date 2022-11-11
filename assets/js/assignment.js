@@ -14,6 +14,7 @@ function sleep(milliseconds) {
     currentDate = Date.now();
   } while (currentDate - date < milliseconds);
 }
+let number = 1;
 
 
 
@@ -22,7 +23,7 @@ function sleep(milliseconds) {
 //document vars
 const dataElement = document.getElementById('data')
 const home = document.getElementById('homeBtn')
-const console = document.getElementById('console')
+const consoleArea = document.getElementById('console')
 let consoleDiv = document.getElementById('consoleDiv')
 const paragraph = document.getElementById('p');
 const header = document.getElementById('header');
@@ -223,11 +224,31 @@ socket.on('runInit', function () {
     consoleDiv.hidden = false;
 })
 
+function createRow(data){
+
+    const row = document.createElement("tr")
+    const numberHolder = document.createElement("td")
+    const num = document.createTextNode(number)
+    numberHolder.appendChild(num)
+
+    const textHolder = document.createElement("td")
+    const text = document.createTextNode(data)
+    textHolder.appendChild(text)
+
+    row.appendChild(numberHolder)
+    row.appendChild(textHolder)
+
+    return row;
+
+}
+
 socket.on('childStdout', function (arg) {
 
     let data = String.fromCharCode.apply(null, new Int8Array(arg))
     console.log("Child stdout! " + data)
-    console.innerHTML += data + "\n"
+    
+    consoleArea.appendChild(createRow(data))
+    number ++;
 })
 
 socket.on('testInitiate', function (arg) {
