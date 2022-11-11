@@ -4,16 +4,6 @@ const sm = require("./sm/socketManager")
 
 let currentlyRunning = false;
 
-function test(module){
-    try{
-        let moduleFile = JSON.parse(fs.readFileSync("./exercise/module.json"))
-        if(!moduleFile.id) throw new Error("Incorrect package")
-        if(moduleFile.id != module.id) throw new Error("Incorrect package")
-        }catch(err){
-                return err;
-            }
-            return "continue";
-}
 
 function run(data){
 
@@ -27,6 +17,7 @@ function run(data){
             console.log(module)
 
             let ready = initiateRun(data, module)
+            console.log(ready)
             if(!ready) return;
 
 
@@ -54,7 +45,7 @@ function run(data){
 
 
 
-async function initiateRun(data, module){
+function initiateRun(data, module){
 
 
 
@@ -84,7 +75,7 @@ async function initiateRun(data, module){
     }
     catch(err){
 
-            console.log(err)
+            console.log("Is not error " + !err)
 
             if(err){
                sm.send(data.id, "downloadStart")

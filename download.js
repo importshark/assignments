@@ -23,7 +23,7 @@ function run(url, socketId) {
 
     }
     fs.writeFileSync("./error.txt", "No Error.")
-    sm.send(socketId, "downloadFinish", err)
+    sm.send(socketId, "downloadFinish")
     
 
 

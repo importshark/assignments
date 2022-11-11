@@ -135,7 +135,7 @@ function send(id, event, data){
 exports.send = send;
 exports.finish = finish;
 
-module.exports = {connect, getIndex, getSocket, getFirst}
+module.exports = {connect, getIndex, getSocket, getFirst, send, finish}
 
 
 

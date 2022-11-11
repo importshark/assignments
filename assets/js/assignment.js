@@ -99,7 +99,7 @@ form.appendChild(button)
 document.body.appendChild(form);
 
 
-function data(){
+function getData(){
 
     for (let i = 0; i < moduleData.requiredData.data.length; i++) {
         let element = document.getElementById(moduleData.requiredData.data[i].id);
@@ -113,7 +113,7 @@ function data(){
 //Create necessary functions for page
 function submit() {
 
-    data()
+    getData()
 
 
 
