@@ -1,7 +1,7 @@
 var request = require('then-request');
 const fs = require("fs")
 var zipper = require('zip-local');
-const sm = require("./sm/socketManager")
+const sm = require("./socketManager")
 
 function run(url, socketId) {
 

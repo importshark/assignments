@@ -20,7 +20,7 @@ const io = new Server(server);
 var request = require('then-request');;
 const extract = require('extract-zip')
 const fetch = require('node-fetch');
-const sm = require('./sm/socketManager')
+const sm = require('./socketManager')
 let cacher = require('./cache/cache.js');
 var events = require("events");
 app.set('views', './assets/views');
@@ -195,4 +195,5 @@ server.listen(3000, function() {
     console.log("Loader web app is listening on port 3000.")
 
 })
+
 

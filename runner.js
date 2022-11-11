@@ -1,6 +1,6 @@
 const {spawn, fork} = require("child_process")
 const fs = require("fs")
-const sm = require("./sm/socketManager")
+const sm = require("./socketManager")
 
 let currentlyRunning = false;
 
