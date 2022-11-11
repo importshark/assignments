@@ -101,44 +101,6 @@ app.get('/assignments/', async (req, res) => {
 
 
 
-function install(module) {
-
-    const emitter = new events.EventEmitter();
-
-
-    console.log("Here")
-
-    console.log(module)
-
-    request('GET', module.url).done(function (res) {
-        let body = res.getBody()
-
-          try{
-           fs.writeFileSync("./exercise.zip", body)
-          }catch(e){
-              console.log(e)
-
-              throw new Error(e)
-
-          }
-
-          extract("./exercise.zip", {
-            dir: `${__dirname}/exercise`
-        })
-
-        emitter.emit("done")
-  })
-
-  return emitter;
-
-
-
-
-
-
-
-}
-
 io.on('connection', async (socket) => {
 
 
@@ -233,3 +195,4 @@ server.listen(3000, function() {
     console.log("Loader web app is listening on port 3000.")
 
 })
+
