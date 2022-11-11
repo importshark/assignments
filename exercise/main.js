@@ -9,4 +9,5 @@ function calculateDots (side){
 }
 //Incoming data will be type string.
 let dots = parseInt(process.argv[2])
+console.log("Initializing.")
 console.log("Dots:" + calculateDots(dots))

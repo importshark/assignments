@@ -14,13 +14,13 @@ function run(data){
 
             let module = modules[data.args[0] - 1]
 
-            console.log(module)
+            console.log("run")
 
             let ready = initiateRun(data, module)
-            console.log(ready)
+            console.log("Is package ready? " + ready)
             if(!ready) return;
 
-
+    debugger;
 
     const child = spawn("node", args, { cwd: "./exercise/"})
 
@@ -50,7 +50,7 @@ function initiateRun(data, module){
 
 
     //get the first user in the queue
-    console.log("run")
+    console.log("runInit")
 
 
 
@@ -64,12 +64,11 @@ function initiateRun(data, module){
 
         let moduleFile = false;
 
-
+        let returnValue = true;
 
 
     try{
         moduleFile = JSON.parse(fs.readFileSync("./exercise/module.json"))
-        console.log(!moduleFile.id)
         if(!moduleFile.id) throw new Error("Incorrect package")
         if(moduleFile.id != module.id) throw new Error("Incorrect package")
     }
@@ -83,7 +82,7 @@ function initiateRun(data, module){
                const download = fork("./download.js", [module.url], {stdio: "ignore", detached: true})
                download.on("close", function() {sm.send(data.id, 'downloadFinish')})
                download.unref();
-               return false;
+               returnValue = false;
             }
 
 
@@ -92,8 +91,8 @@ function initiateRun(data, module){
 
         }
         sm.send(data.id, "beginRun")
-        return true;
-
+       
+        return returnValue;
             };
 
             

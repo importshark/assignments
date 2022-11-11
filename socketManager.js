@@ -1,5 +1,5 @@
 const { spawnSync } = require('child_process');
-const runner = require("../runner")
+const runner = require("./runner")
 
 function getKey(map, searchValue){
      for (let [key, value] of map.entries()) {

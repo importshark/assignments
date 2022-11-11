@@ -22,7 +22,8 @@ function sleep(milliseconds) {
 //document vars
 const dataElement = document.getElementById('data')
 const home = document.getElementById('homeBtn')
-const textArea = document.getElementById('console')
+const console = document.getElementById('console')
+let consoleDiv = document.getElementById('consoleDiv')
 const paragraph = document.getElementById('p');
 const header = document.getElementById('header');
 const anim_holder = document.getElementById('animation_holder');
@@ -32,7 +33,7 @@ const description = document.getElementById('description');
 const data = JSON.parse(dataElement.value);
 const {moduleData} = data;
 
-const array = [moduleData.id];
+let array = [moduleData.id];
 
 //debug variables
 console.log(data)
@@ -42,7 +43,7 @@ paragraph.hidden = true;
 header.hidden = true;
 anim_holder.hidden = true;
 home.hidden = true;
-textArea.hidden = true;
+consoleDiv.hidden = true;
 description.innerHTML = moduleData.description
 
 let form = document.createElement('form');
@@ -100,7 +101,8 @@ document.body.appendChild(form);
 
 
 function getData(){
-
+    array = [moduleData.id]
+    console.log("I am getting the data!")
     for (let i = 0; i < moduleData.requiredData.data.length; i++) {
         let element = document.getElementById(moduleData.requiredData.data[i].id);
     
@@ -136,6 +138,7 @@ for (let i = 0; i < moduleData.requiredData.data.length; i++) {
 
 button.hidden = true;
 
+console.log("I am ready!")
 socket.emit("ready", array);
 
 }, 100)
@@ -161,7 +164,7 @@ return false;
 socket.on('queueUpdate', function(arg){
     header.innerHTML = `You are #${arg} in the queue.`
     doRandom = false;
-    if(arg == 0) paragraph.innerHTML = "You should get a confirmation that the package is starting in the next few seconds."
+    if(arg == 0) paragraph.innerHTML = "Loading package..."
 })
 
 socket.on('finish', function (arg) {
@@ -215,16 +218,16 @@ socket.on('close', function (arg) {
 })
 
 
-socket.on('runStart', function () {
-    console.log("The package is starting")
-    textArea.hidden = false;
+socket.on('runInit', function () {
+    paragraph.innerHTML = "Checking to make sure the package is happy...."
+    consoleDiv.hidden = false;
 })
 
 socket.on('childStdout', function (arg) {
 
     let data = String.fromCharCode.apply(null, new Int8Array(arg))
     console.log("Child stdout! " + data)
-    textArea.innerHTML += data + "\n"
+    console.innerHTML += data + "\n"
 })
 
 socket.on('testInitiate', function (arg) {
