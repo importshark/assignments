@@ -214,6 +214,7 @@ socket.on('close', function (arg) {
 
 })
 
+
 socket.on('runStart', function () {
     console.log("The package is starting")
     textArea.hidden = false;

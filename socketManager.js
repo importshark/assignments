@@ -29,20 +29,6 @@ function getIndex(socket){
     return userQueue.indexOf(value)
 }
 
-function testInterface(socket){
-    return new Promise((resolve, reject) => {
-
-         socket.emit('testInitiate')
-
-                socket.on('testConfirm', function(){
-                    resolve(true);
-                })
-
-                setTimeout(function(){
-                    resolve(false);
-            }, 2000)
-    })
-}
 
 
 function disconnect(socket){
