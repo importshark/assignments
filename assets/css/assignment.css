@@ -1,7 +1,13 @@
 
-textarea {
-    resize: none;
-    overflow: scroll; /* Horizontal and vertical scrollbar*/
+#consoleDiv {
+  background-color: rgb(134, 135, 136);
+}
+
+#dataHolder {
+
+  margin: auto;
+  text-align: center;
+
 }
 
 #overlay {

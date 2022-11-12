@@ -15,6 +15,7 @@ function sleep(milliseconds) {
   } while (currentDate - date < milliseconds);
 }
 let number = 1;
+let last = false;
 
 
 
@@ -29,6 +30,19 @@ const paragraph = document.getElementById('p');
 const header = document.getElementById('header');
 const anim_holder = document.getElementById('animation_holder');
 const description = document.getElementById('description');
+const logButton = document.getElementById('logButton');
+const dataHolder = document.getElementById('dataHolder');
+
+
+function move(){
+
+    paragraph.parentNode.removeChild(paragraph)
+
+    dataHolder.appendChild(paragraph)
+
+}
+
+
 
 //interpret vars, if required
 const data = JSON.parse(dataElement.value);
@@ -44,7 +58,7 @@ paragraph.hidden = true;
 header.hidden = true;
 anim_holder.hidden = true;
 home.hidden = true;
-consoleDiv.hidden = true;
+
 description.innerHTML = moduleData.description
 
 let form = document.createElement('form');
@@ -103,7 +117,6 @@ document.body.appendChild(form);
 
 function getData(){
     array = [moduleData.id]
-    console.log("I am getting the data!")
     for (let i = 0; i < moduleData.requiredData.data.length; i++) {
         let element = document.getElementById(moduleData.requiredData.data[i].id);
     
@@ -138,6 +151,7 @@ for (let i = 0; i < moduleData.requiredData.data.length; i++) {
 }
 
 button.hidden = true;
+description.hidden = true;
 
 console.log("I am ready!")
 socket.emit("ready", array);
@@ -168,11 +182,6 @@ socket.on('queueUpdate', function(arg){
     if(arg == 0) paragraph.innerHTML = "Loading package..."
 })
 
-socket.on('finish', function (arg) {
-    console.log("The package has been installed successfully")
-    finished = true;
-    doRandom = true;
-})
 
 socket.on("childError", function(err){
 
@@ -197,11 +206,14 @@ socket.on("downloadFinish", function(){
 
             console.log("download has finished.")
 
-            console.log(array)
-            
             
             
             socket.emit("ready", array);
+
+            paragraph.innerHTML = "The package has finished downloading."
+            finished = true;
+            doRandom = true;
+
             })
 
 socket.on('close', function (arg) {
@@ -212,7 +224,8 @@ socket.on('close', function (arg) {
 
     socket.close();
 
-    header.innerHTML = "The script has finished running. To restart or run another script, please click below."
+    header.innerHTML = "The script has finished running."
+    header.hidden = false;
 
     home.hidden = false;
 
@@ -220,8 +233,7 @@ socket.on('close', function (arg) {
 
 
 socket.on('runInit', function () {
-    paragraph.innerHTML = "Checking to make sure the package is happy...."
-    consoleDiv.hidden = false;
+    paragraph.innerHTML = "Checking package...."
 })
 
 function createRow(data){
@@ -242,10 +254,33 @@ function createRow(data){
 
 }
 
+
+
 socket.on('childStdout', function (arg) {
+
+    waiting = false;
+    doRandom = false;
+    paragraph.hidden = false;
+    logButton.hidden = false;
+    move();
+
+
+
+    switch(last){
+        case false: 
+            last = true;
+            return;
+            break;
+        case true:
+            last = false;
+            break;
+
+    }
 
     let data = String.fromCharCode.apply(null, new Int8Array(arg))
     console.log("Child stdout! " + data)
+
+    if(data.toLowerCase().startsWith("data: ")) paragraph.innerHTML = "Script returned the following data: " + data.substring(6)
     
     consoleArea.appendChild(createRow(data))
     number ++;
@@ -261,7 +296,6 @@ setInterval(function () {
 
     if(!waiting) {
 
-        paragraph.hidden = true;
         anim_holder.hidden = true;
         return;
     }

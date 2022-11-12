@@ -20,11 +20,11 @@ function run(data){
             console.log("Is package ready? " + ready)
             if(!ready) return;
 
-    debugger;
 
     const child = spawn("node", args, { cwd: "./exercise/"})
 
         child.stdout.on('data', function(data){
+            console.log(data.toString())
             sm.send(id, 'childStdout', data);
             })
 
