@@ -271,36 +271,7 @@ function random(){
 
 function validate(array, moduleData) {
 
-    let errors = [];
-
-    return errors;
-
-
-    for (var i = 0; i < array.length; i++) {
-
-        let {
-            required,
-            type,
-            regex
-        } = moduleData.requiredData.data[i]
-
-        if (!required) continue;
-
-        switch (type) {
-
-            case "integer":
-                if (!validator.isInt(array[i])) errors.push({
-                    index: i,
-                    message: "Invalid integer"
-                })
-                continue;
-                break;
-            case "string":
-                continue;
-                break;
-
-        }
-    }
+    let {validator, type}
 
 
 }
